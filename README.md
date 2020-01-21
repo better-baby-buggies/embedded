@@ -22,4 +22,27 @@ git push
 8. :)
 
 ## File Structure Layout
--TODO: @Isaiah
+The software file structure will be setup as follows.
+```
+.
+│---car_seat.ino
+│---key_fob.ino
+|---test_<submodule-name>.ino
+│---LICENSE
+│---README.md
+│
+├───scripts
+├───logs
+└───src
+    |---parameters.h
+```
+
+
+Notable files:
+*  ```car_seat.ino``` - This file is the main ino for the car seat embedded software.
+*  ```key_fob.ino``` - This file is the main ino for the key fob embedded software.
+*  ```test_<submodule-name>.ino``` - This file is the main test ino for the barebones unit test of each submodule. Examples could be test_power.ino or test_bluetooth.ino. These will automaticially populate serial output into the ```logs``` folder.
+* ```scripts``` will contain the scripts for testing and other utilities.
+* ```src``` will contain development code. Write your .cpp and .h files here.
+* ```parameters.h``` will contain the high level constants and defines necessary in other code. 
+
