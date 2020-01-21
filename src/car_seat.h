@@ -1,11 +1,11 @@
-#include "src/parameters.h"
+#include "parameters.h"
 
-void setup() {
+void _setup() {
   // put your setup code here, to run once:
-
+ 
 }
 
-void loop() {
+void _loop() {
   // put your main code here, to run repeatedly:
 
 }
