@@ -20,3 +20,6 @@ git push
 6. Test the code base buy running all unit tests
 7. Once all unit tests pass, merge into master by creating a pull request and merging it
 8. :)
+
+## File Structure Layout
+-TODO: @Isaiah
