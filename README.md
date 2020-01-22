@@ -25,24 +25,38 @@ git push
 The software file structure will be setup as follows.
 ```
 .
-│---car_seat.ino
-│---key_fob.ino
-|---test_<submodule-name>.ino
-│---LICENSE
-│---README.md
+│   .gitignore
+│   LICENSE
+│   notes.txt
+│   README.md
+│
+├───car_seat
+│       car_seat.ino
+│
+├───key_fob
+│       key_fob.ino
+│
+├───libraries
+│   ├───example
+│   │       example_device_driver.cpp
+│   │       example_device_driver.h
+│   │       other_example.h
+│   │
+│   └───parameters
+│           parameters.h
 │
 ├───scripts
-├───logs
-└───src
-    |---parameters.h
+│
+└───tests
+    └───example_module_test
+            example_module_test.ino
 ```
 
 
 Notable files:
-*  ```car_seat.ino``` - This file is the main ino for the car seat embedded software.
-*  ```key_fob.ino``` - This file is the main ino for the key fob embedded software.
-*  ```test_<submodule-name>.ino``` - This file is the main test ino for the barebones unit test of each submodule. Examples could be test_power.ino or test_bluetooth.ino. These will automaticially populate serial output into the ```logs``` folder.
-* ```scripts``` will contain the scripts for testing and other utilities.
-* ```src``` will contain development code. Write your .cpp and .h files here.
-* ```parameters.h``` will contain the high level constants and defines necessary in other code. 
-
+*  `car_seat.ino` - This file is the main ino for the car seat.
+*  `key_fob.ino` - This file is the main ino for the key fob.
+* `libraries` will contain any shared development code. Each library should be in a seperate folder. These can be included in .ino files with ''' #include <example_device_driver.h> '''
+* `scripts` will contain the scripts for testing and other utilities.
+* `parameters.h` will contain the high level constants and defines necessary in other code.
+* `tests/` - This folder holds all of the test .inos. Later on, an automated system will run these test with the hardware in the loop and log serial output into a 'logs' folder. 
