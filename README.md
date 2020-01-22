@@ -25,28 +25,38 @@ git push
 The software file structure will be setup as follows.
 ```
 .
-│---.gitignore
-│---embedded.ino
-│---LICENSE
-│---README.md
+│   .gitignore
+│   LICENSE
+│   notes.txt
+│   README.md
+│
+├───car_seat
+│       car_seat.ino
+│
+├───key_fob
+│       key_fob.ino
+│
+├───libraries
+│   ├───example
+│   │       example_device_driver.cpp
+│   │       example_device_driver.h
+│   │       other_example.h
+│   │
+│   └───parameters
+│           parameters.h
 │
 ├───scripts
-└───src
-    │---car_seat.h
-    │---key_fob.h
-    │---parameters.h
-    │
-    └───tests
-        │---test_1.h
+│
+└───tests
+    └───example_module_test
+            example_module_test.ino
 ```
 
 
 Notable files:
-*  `embedded.ino` - This file is the main ino for building any software, either for the car seat, keyfob, or any test.
+*  `car_seat.ino` - This file is the main ino for the car seat.
+*  `key_fob.ino` - This file is the main ino for the key fob.
+* `libraries` will contain any shared development code. Each library should be in a seperate folder. These can be included in .ino files with ''' #include <example_device_driver.h> '''
 * `scripts` will contain the scripts for testing and other utilities.
-* `src` will contain development code. Everything should be in a folder except the main files: `car_seat.h`, `key_fob.h`, and `parameters.h`
 * `parameters.h` will contain the high level constants and defines necessary in other code.
-* `car_seat.h, key_fob.h, test_1.h` - Each of these files are responsible for implementing _setup() and _loop(), targeted at their respective item.
-* `test/` - This folder holds all of the automated tests. To create other tests, just add a new file in the `tests/` directory called `<test-name>.h`. This will necessitate adding the appropriate #define's in embedded.ino. Just copy the current structure. Note: to work with the automated testing, the macro definition must be the ALL UPPERCASE version of the `<test-name>.h`. After a tests is ran, these will automaticially populate serial output into the `logs` folder.
-
-Note: because of this setup, arduino will force embedded.ino to be placed in a folder named embedded.
+* `tests/` - This folder holds all of the test .inos. Later on, an automated system will run these test with the hardware in the loop and log serial output into a 'logs' folder. 
