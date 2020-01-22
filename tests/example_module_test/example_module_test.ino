@@ -1,6 +1,12 @@
-#include <example_device_driver.h>
-#include <OtherGuy.h>
+// Parameters library
 #include <parameters.h>
+
+// Example Library
+#include <example_device_driver.h>
+#include <other_example.h>
+
+
+
 
 
 int num = 0;
