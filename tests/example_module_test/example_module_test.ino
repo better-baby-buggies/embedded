@@ -1,5 +1,5 @@
 #include <example_device_driver.h>
-#include <OtherGuy.h>
+#include <other_example.h>
 #include <parameters.h>
 
 
