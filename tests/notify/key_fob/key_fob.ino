@@ -133,7 +133,7 @@ void monitorBabyState(BLEDevice peripheral) {
       if (babyDetectedChar.readValue(value) > 0) {
         // if number of bytes read is greater than 0
 
-        state = value; // read into global variable
+        state = (baby_state)value; // read into global variable
 
 #ifdef DEBUG
         if (state == BABY_DETECTED) {
