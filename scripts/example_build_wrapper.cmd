@@ -1,0 +1,3 @@
+echo running example_build_wrapper.cmd ...
+
+cmd /K build.cmd ./../tests/example_module_test example_module_test.ino
