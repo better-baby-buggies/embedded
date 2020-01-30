@@ -11,8 +11,6 @@ set ino_name=example_module_test.ino
 
 REM ~~~~~~~~~~ Don't edit below this ~~~~~~~
 
-REM if %1 == [] (
-REM if exist %1 (
 if "%1"=="c" (
   REM This works and closes after
   ".\scripts\build.cmd" %cd%/%ino_path% %ino_name%
