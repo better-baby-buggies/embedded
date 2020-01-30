@@ -1,3 +1,4 @@
 .vscode/
-/build
 /notes.txt
+build/
+/vscode_embedded.code-workspace

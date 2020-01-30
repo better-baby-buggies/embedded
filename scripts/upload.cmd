@@ -1,5 +1,5 @@
 @echo off
-REM echo running build.cmd
+REM echo running upload.cmd
 
 set ino_path=%1
 set ino_name=%2
@@ -12,16 +12,15 @@ REM Include board information here
 set board_info=arduino:mbed:nano33ble
 
 cd %ino_path%
-REM cmd /K %arduino_debug% --pref build.path=./build --board %board_info% --verify %ino_name%
-%arduino_debug% --pref build.path=./build --board %board_info% --verify %ino_name%
+%arduino_debug% --upload --board %board_info% --verbose %ino_name%
 
 REM return the error code
 if errorlevel 0 (
-  echo Build Successful
+  echo Upload Successful
   Exit /B 0
 )
 if errorlevel 1 (
-  echo Build Failed
+  echo Upload Failed
   Exit /B 1
 )
 if errorlevel 2 (
