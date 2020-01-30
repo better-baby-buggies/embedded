@@ -60,3 +60,18 @@ Notable files:
 * `scripts` will contain the scripts for testing and other utilities.
 * `parameters.h` will contain the high level constants and defines necessary in other code.
 * `tests/` - This folder holds all of the test .inos. Later on, an automated system will run these test with the hardware in the loop and log serial output into a 'logs' folder. 
+
+
+## Development enviroment setup
+To setup you evnviroment for development and testing:
+
+1. Set you sketchbook to the libraries folder of embedded repo:
+    a. TODO
+2. Download the board information for our Nano 33 Ble
+    a. Open the Arduino IDE.
+    b. Go to Tools -> Boards -> Board Manager.
+    c. In the board manager, search for "Nano 33 BLE".
+    d. Install this board support package.
+    z. Pulled from this tutorial: https://www.arduino.cc/en/Guide/NANO33BLE
+3. (Recommended) Install the Arduino extension for vscode
+    a. Can be downloaded from vscode extension directly or this link: https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino
