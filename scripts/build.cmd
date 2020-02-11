@@ -1,5 +1,5 @@
 @echo off
-REM echo running build.cmd
+echo running build.cmd...
 
 set ino_path=%1
 set ino_name=%2
