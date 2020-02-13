@@ -25,7 +25,7 @@ const bool DEBUG = true;
 #define STARTUP_MESSAGE "key_fob"
 
 #define ALARM_DELAY 100 // milliseconds
-#define ALARM_FREQ 1000 // hertz
+#define ALARM_FREQ 4000 // hertz, recommended here:https://product.tdk.com/info/en/catalog/datasheets/piezoelectronic_buzzer_ps_en.pdf
 
 /* Pins (Arduino) */
 #define POWER_LED_PIN 2     // Power On LED
