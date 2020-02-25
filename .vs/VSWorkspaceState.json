@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\car_seat"
+    "\\car_seat",
+    "\\tests\\example_module_test"
   ],
-  "SelectedNode": "\\car_seat\\car_seat.ino",
+  "SelectedNode": "\\key_fob",
   "PreviewInSolutionExplorer": false
 }
