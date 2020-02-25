@@ -82,8 +82,6 @@ void setup()
     pinMode(HEARTBEAT_LED_PIN, OUTPUT);
     pinMode(TX_LED_PIN, OUTPUT);
     pinMode(RX_LED_PIN, OUTPUT);
-    pinMode(SPEAKER_LED_PIN, OUTPUT);
-    pinMode(SPEAKER_PIN, OUTPUT);
   }
   pinMode(BUTTON0_PIN, INPUT_PULLUP);
 
@@ -95,8 +93,6 @@ void setup()
     digitalWrite(HEARTBEAT_LED_PIN, HIGH);
     digitalWrite(TX_LED_PIN, HIGH);
     digitalWrite(RX_LED_PIN, HIGH);
-    digitalWrite(SPEAKER_LED_PIN, HIGH);
-    digitalWrite(SPEAKER_PIN, HIGH);
   }
 
   // Set inital states
@@ -263,10 +259,22 @@ void toggle_pin(char pin)
 
 void button_triggered(void)
 {
+  DEBUG_PRINTLN("Calling button_triggered");
+  
   // Turn off the alarm if it is on
   alarm_state = ALARM_OFF;
 
   // Show External LEDs
+  DEBUG_PRINT("Setting LEDs: Power: ");
+  DEBUG_PRINT(power_state);
+  DEBUG_PRINT("Connected: ");
+  DEBUG_PRINTLN(connected_state);
   digitalWrite(POWER_LED_PIN, power_state);
   digitalWrite(CONNECTED_LED_PIN, connected_state);
+
+  delay(1000);
+
+  // Turn off LEDs
+  digitalWrite(POWER_LED_PIN, HIGH);
+  digitalWrite(CONNECTED_LED_PIN, HIGH);
 }
