@@ -3,9 +3,9 @@
 #include <ArduinoBLE.h>
 
 BLEService babyService("25576995-63dc-4c59-be89-8907453e623c");
-BLEUnsignedCharCharacteristic babyDetectedChar("25576996-63dc-4c59-be89-8907453e623c1", BLERead | BLENotify);
+BLEUnsignedCharCharacteristic babyDetectedChar("25576996-63dc-4c59-be89-8907453e623c", BLERead | BLENotify);
 
-//#define DEBUG
+#define DEBUG
 
 #define SENSOR_PIN A0 // Weight Sensor Input
 #define CONNECTED_PIN 13 // Bluetooth Connected LED
@@ -111,14 +111,14 @@ void loop()
             // Delay checking of sensor
             delay(DELAY_TIME);
         }
-    }
 
 #ifdef DEBUG
-    Serial.print("Disconnected from central: ");
-    Serial.println(central.address());
+        Serial.print("Disconnected from central: ");
+        Serial.println(central.address());
 #endif
-    // No longer connected via bluetooth
-    digitalWrite(CONNECTED_PIN, LOW);
+        // No longer connected via bluetooth
+        digitalWrite(CONNECTED_PIN, LOW);
+    }
 }
 
 
