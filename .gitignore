@@ -1,3 +1,6 @@
 .vscode/
 /build
 /notes.txt
+/.vs/embedded/v16/Browse.VC.db
+/.vs/slnx.sqlite
+/.vs/embedded/v16/Browse.VC.opendb

@@ -11,10 +11,9 @@ BLEUnsignedCharCharacteristic babyDetectedChar("25576996-63dc-4c59-be89-8907453e
 #define CONNECTED_PIN 13 // Bluetooth Connected LED
 #define SENSOR_LED 2 // Weight Sensor Indicator LED
 #define TX_LED 0 // Data Transfer Indicator LED
-#define RX_LED 1 // Data Received Indicator LED **Necessary?**
 #define HEARTBEAT_LED 3// Heartbeat Pulse LED
 
-#define DELAY_TIME 200 // Delays between checking for updates
+#define DELAY_TIME 160 // Delays between checking for updates
 #define HEARTBEAT_FLASH_TIME 40 // Longer delay to notice hearbeat indicator
 
 enum baby_state {
@@ -29,11 +28,15 @@ void setup()
     // Setup Connected Pin
     pinMode(CONNECTED_PIN, OUTPUT);
     pinMode(SENSOR_LED, OUTPUT);
+    pinMode(TX_LED, OUTPUT);
+    pinMode(HEARTBEAT_LED, OUTPUT);
 
 #ifdef DEBUG
     // Setup debuging serial
     Serial.begin(9600);
     while (!Serial);
+    // Print to serial monitor
+    Serial.println("Serial starting");
 #endif
 
     // Setup BLE device
@@ -92,13 +95,19 @@ void loop()
             if (prev_state != state) {
                 // Set global bluetooth characteristic
                 babyDetectedChar.writeValue(state);
-                //digitalWrite(TX_LED, HIGH); // Value should be transmitted via Bluetooth
+                if (state == BABY_DETECTED){
+                  digitalWrite(SENSOR_LED, HIGH);
+                }
+                else{
+                  digitalWrite(SENSOR_LED, LOW);
+                }
+                digitalWrite(TX_LED, HIGH); // Value should be transmitted via Bluetooth
                 prev_state = state;
             }
             // Indicate heartbeat pulse with delay for visual flash
-            //digitalWrite(HEARTBEAT_LED, HIGH);
-            //delay(HEARTBEAT_FLASH_TIME);
-            //digitalWrite(HEARTBEAT_LED, LOW);
+            digitalWrite(HEARTBEAT_LED, HIGH);
+            delay(HEARTBEAT_FLASH_TIME);
+            digitalWrite(HEARTBEAT_LED, LOW);
             // Delay checking of sensor
             delay(DELAY_TIME);
         }
@@ -119,14 +128,12 @@ baby_state check_baby() {
     int sensor_value = 0;
     sensor_value = analogRead(SENSOR_PIN);
 
-    // Check if voltage read is greater than ~1.5 V (R=10k)
-    if (sensor_value > 465) {
+    // Check if voltage read is less than ~0.5 V (R=10k)
+    if (sensor_value < 160) {
         baby = BABY_DETECTED;
-        //digitalWrite(SENSOR_LED, HIGH);
     }
     else {
         baby = BABY_NOT_DETECTED;
-        //digitalWrite(SENSOR_LED, LOW);
     }
     return baby;
 }
