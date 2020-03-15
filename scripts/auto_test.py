@@ -43,8 +43,11 @@ class AutoTest():
       # Print the filename and return code.
       out = ''.join(map(str, ino_filename)) + " build return was: " + str(ret_code)
       self.info_log_and_print_string(out)
-      
 
+      # TODO Upload scripts here
+      # TODO use putty to grab output and write it to a file. 
+      # https://the.earth.li/~sgtatham/putty/0.73/htmldoc/Chapter3.html#using-cmdline
+      
 
 
   # This function enters the "tests" folder and adds the files matching '*.ino"
