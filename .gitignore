@@ -2,3 +2,5 @@
 /notes.txt
 build/
 /vscode_embedded.code-workspace
+/libraries/ArduinoBLE
+/scripts/logs/

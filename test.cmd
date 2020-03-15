@@ -1,0 +1,1 @@
+".\\scripts\\build.cmd", ".\\tests\\example_module_test", "example_module_test.ino"
