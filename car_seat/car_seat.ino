@@ -3,9 +3,9 @@
 #include <ArduinoBLE.h>
 
 BLEService babyService("25576995-63dc-4c59-be89-8907453e623c");
-BLEUnsignedCharCharacteristic babyDetectedChar("25576996-63dc-4c59-be89-8907453e623c", BLERead | BLENotify);
+BLEUnsignedCharCharacteristic babyDetectedChar("25576996-63dc-4c59-be89-8907453e623c", BLERead);
 
-#define DEBUG
+//#define DEBUG
 
 #define SENSOR_PIN A0 // Weight Sensor Input
 #define CONNECTED_PIN 13 // Bluetooth Connected LED
@@ -92,7 +92,7 @@ void loop()
             }
 #endif
             // If value changed since last read
-            if (prev_state != state) {
+            //if (prev_state != state) {
                 // Set global bluetooth characteristic
                 babyDetectedChar.writeValue(state);
                 if (state == BABY_DETECTED){
@@ -103,7 +103,7 @@ void loop()
                 }
                 digitalWrite(TX_LED, HIGH); // Value should be transmitted via Bluetooth
                 prev_state = state;
-            }
+            //}
             // Indicate heartbeat pulse with delay for visual flash
             digitalWrite(HEARTBEAT_LED, HIGH);
             delay(HEARTBEAT_FLASH_TIME);

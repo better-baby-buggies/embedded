@@ -2,7 +2,7 @@
 
 #include <ArduinoBLE.h>
 
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 #define DEBUG_PRINT(str) \
   do                     \
@@ -26,8 +26,8 @@ const bool DEBUG = true;
 
 #define DEBUG_LED_FLASH_TIME 50
 
-#define ALARM_DELAY 100 // milliseconds
-#define ALARM_FREQ 4000 // hertz, recommended here:https://product.tdk.com/info/en/catalog/datasheets/piezoelectronic_buzzer_ps_en.pdf
+#define ALARM_DURATION 250  // milliseconds
+#define ALARM_FREQ 4000     // hertz, recommended here:https://product.tdk.com/info/en/catalog/datasheets/piezoelectronic_buzzer_ps_en.pdf
 
 /* Pins (Arduino) */
 #define POWER_LED_PIN 2     // Power On LED
@@ -54,18 +54,16 @@ typedef enum
   ALARM_ON
 } alarm_state_t;
 
-volatile alarm_state_t alarm_state;
-
 // Either HIGH or LOW
 const char power_state = LOW; // Alway on
 char connected_state;
 
 // Function Declarations
-void button_triggered(void);
+void monitorBabyState(BLEDevice peripheral);
+void disconnect(BLEDevice peripheral);
 void alert_user(void);
 void flash_pin(short pin);
 void check_leds(void);
-void blePeripheralDisconnectHandler(BLEDevice device);
 
 void setup()
 {
@@ -101,27 +99,22 @@ void setup()
 
   // Set inital states
   baby_state = BABY_NOT_DETECTED;
-  alarm_state = ALARM_OFF;
   connected_state = HIGH;
-
-
-  // Setup button trigger
-  attachInterrupt(digitalPinToInterrupt(BUTTON0_PIN), button_triggered, FALLING);
 
   // initialize the BLE hardware
   BLE.begin();
-  BLE.setTimeout(500);
-  BLE.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
+  //BLE.setTimeout(1000);
 
   DEBUG_PRINTLN("BLE Central - Baby Monitor");
-
-  // start scanning for peripherals
-  BLE.scanForUuid("25576995-63dc-4c59-be89-8907453e623c");
 }
 
 void loop()
 {
   check_leds();
+
+  delay(100);
+  DEBUG_PRINTLN("Starting Scan...");
+  BLE.scanForUuid("25576995-63dc-4c59-be89-8907453e623c", false);
 
   // check if a peripheral has been discovered
   BLEDevice peripheral = BLE.available();
@@ -144,9 +137,6 @@ void loop()
     BLE.stopScan();
 
     monitorBabyState(peripheral);
-
-    // peripheral disconnected, start scanning again
-    BLE.scanForUuid("25576995-63dc-4c59-be89-8907453e623c");
   }
 }
 
@@ -171,7 +161,7 @@ void monitorBabyState(BLEDevice peripheral)
   if (!peripheral.discoverAttributes())
   {
     DEBUG_PRINTLN("Attribute discovery failed!");
-    peripheral.disconnect();
+    disconnect(peripheral);
     return;
   }
 
@@ -181,84 +171,91 @@ void monitorBabyState(BLEDevice peripheral)
   BLECharacteristic babyDetectedChar = peripheral.characteristic("25576996-63dc-4c59-be89-8907453e623c");
 
   // subscribe to the baby detection characteristic
-  DEBUG_PRINTLN("Subscribing to baby detection characteristic ...");
   if (!babyDetectedChar)
   {
     DEBUG_PRINTLN("No baby detection characteristic found!");
-    peripheral.disconnect();
+    disconnect(peripheral);
     return;
   }
-  else if (!babyDetectedChar.canSubscribe())
-  {
-    DEBUG_PRINTLN("Baby detection characteristic is not subscribable!");
-    peripheral.disconnect();
-    return;
-  }
-  else if (!babyDetectedChar.subscribe())
-  {
-    DEBUG_PRINTLN("Subscription failed!");
-    peripheral.disconnect();
-    return;
-  } 
-  DEBUG_PRINTLN("Subscribed");
 
   // while the peripheral is connected
   while (peripheral.connected())
   {
     check_leds();
     flash_pin(HEARTBEAT_LED_PIN);
+    
     // check if the value of the baby detection characteristic has been updated
-    if (babyDetectedChar.valueUpdated())
+    byte value = 0;
+    if (babyDetectedChar.readValue(value) > 0)
     {
-      byte value = 0;
+      // if number of bytes read is greater than 0
+      flash_pin(RX_LED_PIN);           // Value was received via Bluetooth
+      baby_state = (baby_state_t)value; // read into global state
 
-      if (babyDetectedChar.readValue(value) > 0)
+      if (baby_state == BABY_DETECTED)
       {
-        // if number of bytes read is greater than 0
-        flash_pin(RX_LED_PIN);           // Value was received via Bluetooth
-        baby_state = (baby_state_t)value; // read into global state
-
-        if (baby_state == BABY_DETECTED)
-        {
-          DEBUG_PRINTLN("Baby was Detected");
-        }
-        if (baby_state == BABY_NOT_DETECTED)
-        {
-          DEBUG_PRINTLN("Baby was not Detected");
-        }
+        DEBUG_PRINTLN("Baby was Detected");
+      }
+      if (baby_state == BABY_NOT_DETECTED)
+      {
+        DEBUG_PRINTLN("Baby was not Detected");
       }
     }
-    BLE.poll(500);
+    else
+    {
+      DEBUG_PRINTLN("No Bytes Read!!");
+      disconnect(peripheral);
+      return;
+    }
+  }
+  
+  disconnect(peripheral);
+  return;
+}
+
+void disconnect(BLEDevice peripheral)
+{
+  DEBUG_PRINTLN("Disconnecting...");
+  if (peripheral.disconnect())
+  {
+    DEBUG_PRINTLN("Peripheral disconnected successfully");
+  }
+  else
+  {
+    DEBUG_PRINTLN("Peripheral disconnected unsuccessfully");
+    DEBUG_PRINT("Connected state: ");
+    DEBUG_PRINTLN((bool)peripheral.connected());
   }
 
-  // DEBUG_PRINTLN("Peripheral disconnected");
-  // connected_state = HIGH; // Turn off LED
+  connected_state = HIGH; // Turn off LED
 
-  // // Alert the User if the last baby_state recieved was BABY_DETECTED
-  // // since we have disconnected
-  // if (baby_state == BABY_DETECTED)
-  // {
-  //   alert_user();
-  // }
+  // Alert the User if the last baby_state recieved was BABY_DETECTED
+  // since we have disconnected
+  if (baby_state == BABY_DETECTED)
+  {
+    alert_user();
+    baby_state = BABY_NOT_DETECTED;
+  }
 }
 
 // This function should sound the alarm in the key fob
 // This function should not return until the user presses the BUTTON0
 void alert_user()
 {
-  DEBUG_PRINTLN("Alerting User");
-  alarm_state = ALARM_ON;
+  DEBUG_PRINTLN("Turning on alarm");
 
   // Sound alarm until button press
-  while (alarm_state == ALARM_ON)
+  do
   {
-    check_leds();
-    tone(SPEAKER_PIN, ALARM_FREQ, ALARM_DELAY);
-    if (DEBUG)
-    {
-      tone(SPEAKER_LED_PIN, ALARM_FREQ, ALARM_DELAY);
-    }
-  }
+    //check_leds();
+
+    tone(SPEAKER_PIN, ALARM_FREQ, ALARM_DURATION);
+    delay(ALARM_DURATION*2);
+    noTone(SPEAKER_PIN);
+
+  } while (digitalRead(BUTTON0_PIN) != LOW);
+  
+  DEBUG_PRINTLN("Alarm Off");
 }
 
 // Only use on debug pins
@@ -268,15 +265,6 @@ void flash_pin(short pin)
   delay(DEBUG_LED_FLASH_TIME); // Wait
   digitalWrite(pin, HIGH); // Turn off
   delay(DEBUG_LED_FLASH_TIME); // Wait
-}
-
-void button_triggered(void)
-{
-  // digitalWrite(POWER_LED_PIN, power_state);
-  // digitalWrite(CONNECTED_LED_PIN, connected_state);
-  
-  // Turn off the alarm if it is on
-  alarm_state = ALARM_OFF;
 }
 
 void check_leds(void)
@@ -292,18 +280,5 @@ void check_leds(void)
     // Turn off LEDs
     digitalWrite(POWER_LED_PIN, HIGH);
     digitalWrite(CONNECTED_LED_PIN, HIGH);
-  }
-}
-
-void blePeripheralDisconnectHandler(BLEDevice device)
-{
-  DEBUG_PRINTLN("Peripheral disconnected Handler");
-  connected_state = HIGH; // Turn off LED
-
-  // Alert the User if the last baby_state recieved was BABY_DETECTED
-  // since we have disconnected
-  if (baby_state == BABY_DETECTED)
-  {
-    alert_user();
   }
 }
